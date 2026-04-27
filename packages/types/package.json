@@ -1,0 +1,37 @@
+{
+  "name": "@altheia/types",
+  "version": "0.0.1",
+  "description": "Shared TypeScript types + zod schemas for the Altheia trust layer.",
+  "license": "Apache-2.0",
+  "homepage": "https://altheia.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/altheia-xyz/altheia-sdk.git",
+    "directory": "packages/types"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "dev": "tsup src/index.ts --format esm --dts --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

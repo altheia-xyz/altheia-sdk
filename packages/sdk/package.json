@@ -1,0 +1,39 @@
+{
+  "name": "@altheia/sdk",
+  "version": "0.0.1",
+  "description": "Altheia SDK — gate AI agent actions with on-chain-enforced policy. The trust layer for crypto AI agents.",
+  "license": "Apache-2.0",
+  "homepage": "https://altheia.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/altheia-xyz/altheia-sdk.git",
+    "directory": "packages/sdk"
+  },
+  "keywords": ["solana", "ai", "agent", "iam", "swig", "altheia", "audit", "policy"],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "dev": "tsup src/index.ts --format esm --dts --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@altheia/types": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

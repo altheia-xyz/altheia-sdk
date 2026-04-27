@@ -1,0 +1,36 @@
+{
+  "name": "@altheia/mcp",
+  "version": "0.0.1",
+  "description": "Altheia MCP server — gate AI agent actions through any MCP-aware client (Claude Desktop, Cursor, ChatGPT).",
+  "license": "Apache-2.0",
+  "homepage": "https://altheia.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/altheia-xyz/altheia-sdk.git",
+    "directory": "packages/mcp"
+  },
+  "keywords": ["mcp", "model-context-protocol", "solana", "ai", "agent", "altheia"],
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "altheia-mcp": "./dist/cli.js"
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsup src/index.ts src/cli.ts --format esm --dts --clean",
+    "dev": "tsup src/index.ts src/cli.ts --format esm --dts --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/cli.js"
+  },
+  "dependencies": {
+    "@altheia/sdk": "workspace:*",
+    "@altheia/types": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
