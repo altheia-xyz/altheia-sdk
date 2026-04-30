@@ -127,6 +127,174 @@ export const AgentObjectSchema = z.object({
 });
 export type AgentObject = z.infer<typeof AgentObjectSchema>;
 
+// ─── Operator ─────────────────────────────────────────────────────
+
+export const PlanTierSchema = z.enum(["free", "starter", "pro", "enterprise"]);
+export type PlanTier = z.infer<typeof PlanTierSchema>;
+
+export const OperatorStatusSchema = z.enum(["active", "suspended", "deleted"]);
+export type OperatorStatus = z.infer<typeof OperatorStatusSchema>;
+
+export const OperatorObjectSchema = z.object({
+  id: z.string().uuid(),
+  wallet_pubkey: z.string(),
+  display_name: z.string().nullable(),
+  email: z.string().email().nullable(),
+  plan_tier: PlanTierSchema,
+  status: OperatorStatusSchema,
+  alert_webhook_url: z.string().url().nullable(),
+  alert_slack_webhook: z.string().url().nullable(),
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime(),
+});
+export type OperatorObject = z.infer<typeof OperatorObjectSchema>;
+
+// ─── Audit ────────────────────────────────────────────────────────
+
+export const AuditEventTypeSchema = z.enum([
+  // Identity Program events
+  "agent_registered",
+  "policy_updated",
+  "agent_paused",
+  "agent_unpaused",
+  "agent_revoked",
+  "agent_archived",
+  "audit_root_committed",
+  // SDK pre-flight events
+  "action_allowed",
+  "action_denied",
+  // Substrate (Swig) on-chain events
+  "transfer_allowed",
+  "transfer_denied",
+  "session_key_created",
+  "session_key_revoked",
+  "scope_violation_on_chain",
+  // SDK telemetry
+  "sdk_heartbeat",
+]);
+export type AuditEventType = z.infer<typeof AuditEventTypeSchema>;
+
+export const DecisionLabelSchema = z.enum(["allowed", "denied", "n/a"]);
+export type DecisionLabel = z.infer<typeof DecisionLabelSchema>;
+
+export const AuditEventSchema = z.object({
+  id: z.string().uuid(),
+  operator_id: z.string().uuid(),
+  agent_id: z.string().uuid().nullable(),
+  event_type: AuditEventTypeSchema,
+  action_descriptor: ActionDescriptorSchema.nullable(),
+  decision: DecisionLabelSchema.nullable(),
+  reason_code: z.string().nullable(),
+  reason_detail: z.string().nullable(),
+  tx_signature: z.string().nullable(),
+  log_index: z.number().int().nullable(),
+  slot: z.number().int().nullable(),
+  block_time: z.string().datetime().nullable(),
+  amount_lamports: z.number().int().nullable(),
+  amount_token: z.number().int().nullable(),
+  asset_mint: z.string().nullable(),
+  source: z.string().nullable(),
+  destination: z.string().nullable(),
+  metadata: z.record(z.unknown()).nullable(),
+  merkle_root_committed: z.string().nullable(),
+  created_at: z.string().datetime(),
+});
+export type AuditEvent = z.infer<typeof AuditEventSchema>;
+
+// ─── HTTP DTOs ────────────────────────────────────────────────────
+
+// Auth: POST /auth/challenge
+export const AuthChallengeRequestSchema = z.object({
+  wallet: z.string(),
+});
+export type AuthChallengeRequest = z.infer<typeof AuthChallengeRequestSchema>;
+
+export const AuthChallengeResponseSchema = z.object({
+  challenge: z.string(),
+  expires_at: z.number().int(),
+});
+export type AuthChallengeResponse = z.infer<typeof AuthChallengeResponseSchema>;
+
+// Auth: POST /auth/verify
+export const AuthVerifyRequestSchema = z.object({
+  wallet: z.string(),
+  challenge: z.string(),
+  signature: z.string(),
+});
+export type AuthVerifyRequest = z.infer<typeof AuthVerifyRequestSchema>;
+
+export const AuthVerifyResponseSchema = z.object({
+  token: z.string(),
+  expires_at: z.number().int(),
+  operator: OperatorObjectSchema,
+});
+export type AuthVerifyResponse = z.infer<typeof AuthVerifyResponseSchema>;
+
+// Agents: POST /agents
+export const RegisterAgentRequestSchema = z.object({
+  name: z.string().min(1).max(64),
+  framework: FrameworkSchema,
+  model_commitment: z.string().regex(/^[0-9a-f]{64}$/),
+  policy: PolicyObjectSchema,
+  substrate: SubstrateSchema.optional(),
+});
+export type RegisterAgentRequest = z.infer<typeof RegisterAgentRequestSchema>;
+
+export const RegisterAgentResponseSchema = z.object({
+  agent: AgentObjectSchema,
+  session_key: z.object({
+    pubkey: z.string(),
+    secret_encrypted: z.string(),
+  }),
+});
+export type RegisterAgentResponse = z.infer<typeof RegisterAgentResponseSchema>;
+
+// Agents: PATCH /agents/:id
+export const UpdateAgentRequestSchema = z.object({
+  name: z.string().min(1).max(64).optional(),
+  policy: PolicyObjectSchema.optional(),
+});
+export type UpdateAgentRequest = z.infer<typeof UpdateAgentRequestSchema>;
+
+// Agents: POST /agents/:id/revoke
+export const RevokeAgentRequestSchema = z.object({
+  reason_code: z.string().min(1).max(64),
+  reason_detail: z.string().max(512).optional(),
+});
+export type RevokeAgentRequest = z.infer<typeof RevokeAgentRequestSchema>;
+
+// SDK: POST /sdk/agent_check
+export const SdkAgentCheckRequestSchema = z.object({
+  agent_id: z.string().uuid(),
+  action: ActionDescriptorSchema,
+  context: z.record(z.unknown()).optional(),
+});
+export type SdkAgentCheckRequest = z.infer<typeof SdkAgentCheckRequestSchema>;
+
+export const SdkAgentCheckResponseSchema = z.object({
+  allowed: z.boolean(),
+  reason: z.string().optional(),
+  reason_code: z.string().optional(),
+  audit_event_id: z.string().uuid(),
+});
+export type SdkAgentCheckResponse = z.infer<typeof SdkAgentCheckResponseSchema>;
+
+// SDK: POST /sdk/heartbeat
+export const SdkHeartbeatRequestSchema = z.object({
+  agent_id: z.string().uuid(),
+  status: z.enum(["healthy", "degraded", "stopped"]),
+  metrics: z.record(z.unknown()).optional(),
+});
+export type SdkHeartbeatRequest = z.infer<typeof SdkHeartbeatRequestSchema>;
+
+// Generic error envelope returned by all routes on 4xx/5xx
+export const ApiErrorSchema = z.object({
+  error: z.string(),
+  code: z.string().optional(),
+  detail: z.string().optional(),
+});
+export type ApiError = z.infer<typeof ApiErrorSchema>;
+
 // ─── Errors ───────────────────────────────────────────────────────
 
 export class PolicyDeniedError extends Error {
@@ -141,7 +309,7 @@ export class PolicyDeniedError extends Error {
 }
 
 export class AltheiaConnectionError extends Error {
-  constructor(message: string, public readonly cause?: unknown) {
+  constructor(message: string, public override readonly cause?: unknown) {
     super(message);
     this.name = "AltheiaConnectionError";
   }
