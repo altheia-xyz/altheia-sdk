@@ -71,15 +71,11 @@ export class Altheia {
 
   /** Check whether an action would be allowed, without executing it. */
   async check(action: ActionDescriptor): Promise<Decision> {
-    const url = `${this.endpoint}/sdk/agent_check`;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
     try {
-      const res = await fetch(url, {
+      const res = await this.fetchWithTimeout(`${this.endpoint}/sdk/agent_check`, {
         method: "POST",
         headers: this.headers(),
         body: JSON.stringify({ agent_id: this.config.agentId, action }),
-        signal: controller.signal,
       });
       if (!res.ok) {
         return this.handleFailure(new AltheiaConnectionError(`backend returned ${res.status}`));
@@ -88,8 +84,6 @@ export class Altheia {
     } catch (err) {
       const cause = err instanceof Error ? err : new Error(String(err));
       return this.handleFailure(new AltheiaConnectionError(cause.message, cause));
-    } finally {
-      clearTimeout(timer);
     }
   }
 
@@ -100,39 +94,28 @@ export class Altheia {
     audit_event_id?: string;
     detail?: string;
   }): Promise<void> {
-    const url = `${this.endpoint}/sdk/agent_report`;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
     try {
-      await fetch(url, {
+      await this.fetchWithTimeout(`${this.endpoint}/sdk/agent_report`, {
         method: "POST",
         headers: this.headers(),
         body: JSON.stringify({ agent_id: this.config.agentId, ...event }),
-        signal: controller.signal,
       });
-    } catch {
-      // best-effort; swallow
-    } finally {
-      clearTimeout(timer);
+    } catch (err) {
+      // best-effort; surface at warn level so users can see SDK-internal issues without crashing.
+      console.warn("[altheia] report() failed:", err instanceof Error ? err.message : err);
     }
   }
 
   /** Send a heartbeat that the agent is alive. Best-effort. */
   async ping(status: { status: "healthy" | "degraded" | "down"; detail?: string } = { status: "healthy" }): Promise<void> {
-    const url = `${this.endpoint}/sdk/heartbeat`;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
     try {
-      await fetch(url, {
+      await this.fetchWithTimeout(`${this.endpoint}/sdk/heartbeat`, {
         method: "POST",
         headers: this.headers(),
         body: JSON.stringify({ agent_id: this.config.agentId, ...status }),
-        signal: controller.signal,
       });
-    } catch {
-      // best-effort
-    } finally {
-      clearTimeout(timer);
+    } catch (err) {
+      console.warn("[altheia] ping() failed:", err instanceof Error ? err.message : err);
     }
   }
 
@@ -149,6 +132,17 @@ export class Altheia {
     const h: Record<string, string> = { "Content-Type": "application/json" };
     if (this.config.apiKey) h["Authorization"] = `Bearer ${this.config.apiKey}`;
     return h;
+  }
+
+  /** Single source of truth for fetch + AbortController timeout (CQ-1). */
+  private async fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+    try {
+      return await fetch(url, { ...init, signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   private handleFailure(err: AltheiaConnectionError): Decision {
