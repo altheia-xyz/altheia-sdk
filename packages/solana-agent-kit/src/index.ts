@@ -1,37 +1,154 @@
 /**
  * @altheia/solana-agent-kit — gate every Solana Agent Kit (SAK) action through Altheia.
  *
- * Wraps a SAK instance so every action method (swap, transfer, deposit, borrow,
- * etc.) goes through `altheia.guard()`. Pre-flight check + audit emission +
- * on-chain enforcement (via Swig session-key scope) — all transparent to the
- * existing SAK agent code.
+ * Wraps a SAK instance so action methods (transfer, trade, etc.) go through
+ * `altheia.guard()` — pre-flight policy check + audit emission + on-chain
+ * enforcement (via Swig session-key scope). Read methods (get*, fetch*, list*)
+ * pass through without guard. Unknown methods pass through with an optional
+ * `onAction` callback so consumers can log/inspect them.
  *
  * Usage:
  *
- *   const agent = withAltheia(
- *     new SolanaAgentKit(...),
- *     { apiKey: env.ALTHEIA_API_KEY, agentId: env.ALTHEIA_AGENT_ID }
- *   );
- *   await agent.swap(...); // gated by Altheia
+ *   import { SolanaAgentKit } from "solana-agent-kit";
+ *   import { withAltheia } from "@altheia/solana-agent-kit";
+ *
+ *   const sak = new SolanaAgentKit(privateKey, rpcUrl);
+ *   const agent = withAltheia(sak, { agentId: process.env.ALTHEIA_AGENT_ID! });
+ *
+ *   // Now gated:
+ *   await agent.transfer(toPubkey, 50, USDC_MINT);
+ *   await agent.trade(SOL_MINT, 0.5, USDC_MINT);
  */
 
-import { Altheia, type AltheiaConfig } from "@altheia/sdk";
+import {
+  Altheia,
+  type AltheiaConfig,
+  type ActionDescriptor,
+  PolicyDeniedError,
+} from "@altheia/sdk";
 
+type ActionMapper = (args: unknown[]) => ActionDescriptor | null;
+
+export interface WithAltheiaOptions {
+  /** Custom action mappers, keyed by SAK method name. Merged over defaults. */
+  actionMap?: Record<string, ActionMapper>;
+  /** Predicate for methods that should bypass guard. Default: get/fetch/list prefixes. */
+  passthrough?: (methodName: string) => boolean;
+  /** Per-call event hook — useful for demo voice-over logging. */
+  onAction?: (event: AdapterEvent) => void;
+}
+
+export type AdapterEvent =
+  | { method: string; action: ActionDescriptor; outcome: "allowed"; auditEventId?: string }
+  | { method: string; action: ActionDescriptor; outcome: "denied"; reason: string; reasonCode?: string }
+  | { method: string; outcome: "passthrough" }
+  | { method: string; action: ActionDescriptor; outcome: "error"; error: string };
+
+const DEFAULT_PASSTHROUGH = (m: string) =>
+  m.startsWith("get") ||
+  m.startsWith("fetch") ||
+  m.startsWith("list") ||
+  m === "wallet" ||
+  m === "connection" ||
+  m === "publicKey";
+
+const DEFAULT_ACTION_MAP: Record<string, ActionMapper> = {
+  // SAK transfer(to, amount, mint?) → Altheia transfer
+  transfer: (args) => {
+    const [to, amount, mint] = args as [string?, number?, string?];
+    if (typeof amount !== "number") return null;
+    return {
+      type: "transfer",
+      amount,
+      ...(mint ? { asset: mint } : { asset: "SOL" }),
+      ...(to ? { target: to } : {}),
+    };
+  },
+  // SAK trade(outputMint, inputAmount, inputMint?, slippageBps?) → Altheia swap
+  // target is the Jupiter aggregator program (always Jupiter v6 in SAK).
+  trade: (args) => {
+    const [outputMint, inputAmount, inputMint] = args as [string?, number?, string?, number?];
+    if (typeof inputAmount !== "number") return null;
+    return {
+      type: "swap",
+      amount: inputAmount,
+      ...(inputMint ? { asset: inputMint } : { asset: "SOL" }),
+      ...(outputMint
+        ? { target: outputMint, metadata: { aggregator: "jupiter-v6" } }
+        : { metadata: { aggregator: "jupiter-v6" } }),
+    };
+  },
+  // Add more SAK methods via opts.actionMap.
+  // ActionDescriptor.type is restricted to: transfer | swap | sign | invoke | inference | custom.
+};
+
+/**
+ * Wrap a SAK instance so action methods route through `altheia.guard()`.
+ *
+ * @param sak                   Any SAK-shaped object.
+ * @param altheiaOrConfig       An existing Altheia instance OR an AltheiaConfig.
+ * @param opts                  Custom mappers, passthrough rules, event hook.
+ */
 export function withAltheia<T extends object>(
   sak: T,
-  _config: AltheiaConfig
+  altheiaOrConfig: Altheia | AltheiaConfig,
+  opts: WithAltheiaOptions = {},
 ): T {
-  // TODO: proxy SAK methods through Altheia.guard
-  // TODO: map SAK action types -> ActionDescriptor (type, amount, asset, target)
-  // TODO: handle errors / denials / reports
+  const altheia =
+    altheiaOrConfig instanceof Altheia
+      ? altheiaOrConfig
+      : new Altheia(altheiaOrConfig);
+  const actionMap = { ...DEFAULT_ACTION_MAP, ...(opts.actionMap ?? {}) };
+  const passthrough = opts.passthrough ?? DEFAULT_PASSTHROUGH;
+  const emit = opts.onAction ?? (() => undefined);
+
   return new Proxy(sak, {
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
-      // For now: pass-through. Wrap in guard once SAK action surface is wired.
-      return value;
+      if (typeof value !== "function") return value;
+      const methodName = String(prop);
+
+      if (passthrough(methodName)) {
+        return value.bind(target);
+      }
+
+      const mapper = actionMap[methodName];
+      if (!mapper) {
+        return (...args: unknown[]) => {
+          emit({ method: methodName, outcome: "passthrough" });
+          return value.apply(target, args);
+        };
+      }
+
+      return async (...args: unknown[]) => {
+        const action = mapper(args);
+        if (!action) {
+          emit({ method: methodName, outcome: "passthrough" });
+          return value.apply(target, args);
+        }
+        try {
+          const result = await altheia.guard(action, () => value.apply(target, args));
+          emit({ method: methodName, action, outcome: "allowed" });
+          return result;
+        } catch (err) {
+          if (err instanceof PolicyDeniedError) {
+            emit({
+              method: methodName,
+              action,
+              outcome: "denied",
+              reason: err.reason,
+              ...(err.reasonCode ? { reasonCode: err.reasonCode } : {}),
+            });
+          } else {
+            const message = err instanceof Error ? err.message : String(err);
+            emit({ method: methodName, action, outcome: "error", error: message });
+          }
+          throw err;
+        }
+      };
     },
   });
 }
 
-export { Altheia } from "@altheia/sdk";
-export type { AltheiaConfig } from "@altheia/sdk";
+export { Altheia, PolicyDeniedError } from "@altheia/sdk";
+export type { AltheiaConfig, ActionDescriptor } from "@altheia/sdk";
