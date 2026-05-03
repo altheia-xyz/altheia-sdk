@@ -216,6 +216,54 @@ describe("withAltheia (SAK adapter)", () => {
     });
   });
 
+  describe("null mapper edge cases (TEST-6)", () => {
+    it("transfer mapper returns null when amount is missing → passes through unguarded", async () => {
+      const fetchSpy = mockFetch(allowed);
+      globalThis.fetch = fetchSpy as never;
+      const events: AdapterEvent[] = [];
+      const sak = new FakeSAK();
+      const guarded = withAltheia(
+        sak,
+        { agentId: AGENT_ID, endpoint: "http://test" },
+        { onAction: (e) => events.push(e) },
+      );
+
+      // Cast via unknown — call signature matches but TS checks know amount is required.
+      await (guarded as unknown as { transfer: (...a: unknown[]) => Promise<string> }).transfer("R...");
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(events[0]).toEqual({ method: "transfer", outcome: "passthrough" });
+    });
+
+    it("trade mapper returns null when inputAmount is missing → passes through", async () => {
+      const fetchSpy = mockFetch(allowed);
+      globalThis.fetch = fetchSpy as never;
+      const events: AdapterEvent[] = [];
+      const sak = new FakeSAK();
+      const guarded = withAltheia(
+        sak,
+        { agentId: AGENT_ID, endpoint: "http://test" },
+        { onAction: (e) => events.push(e) },
+      );
+
+      await (guarded as unknown as { trade: (...a: unknown[]) => Promise<string> }).trade("So111...");
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(events[0]).toEqual({ method: "trade", outcome: "passthrough" });
+    });
+  });
+
+  describe("identity stability (CQ-3)", () => {
+    it("guarded.transfer === guarded.transfer (cached wrapper)", () => {
+      const sak = new FakeSAK();
+      const guarded = withAltheia(sak, { agentId: AGENT_ID, endpoint: "http://test" });
+      // Access the same property twice — should return the same function reference.
+      const first = guarded.transfer;
+      const second = guarded.transfer;
+      expect(first).toBe(second);
+    });
+  });
+
   describe("config flexibility", () => {
     it("accepts a pre-built Altheia instance", async () => {
       globalThis.fetch = mockFetch(allowed) as never;

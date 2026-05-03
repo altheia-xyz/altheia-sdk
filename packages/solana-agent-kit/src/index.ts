@@ -102,50 +102,59 @@ export function withAltheia<T extends object>(
   const passthrough = opts.passthrough ?? DEFAULT_PASSTHROUGH;
   const emit = opts.onAction ?? (() => undefined);
 
+  // CQ-3 + CQ-5: cache wrapped methods so `guarded.transfer === guarded.transfer`
+  // (identity-stable) and we don't allocate a fresh closure on every property access.
+  const wrapperCache = new Map<string, (...args: unknown[]) => unknown>();
+
+  function buildWrapper(methodName: string, fn: Function): (...args: unknown[]) => unknown {
+    if (passthrough(methodName)) {
+      return fn.bind(sak) as (...args: unknown[]) => unknown;
+    }
+    const mapper = actionMap[methodName];
+    if (!mapper) {
+      return (...args: unknown[]) => {
+        emit({ method: methodName, outcome: "passthrough" });
+        return fn.apply(sak, args);
+      };
+    }
+    return async (...args: unknown[]) => {
+      const action = mapper(args);
+      if (!action) {
+        emit({ method: methodName, outcome: "passthrough" });
+        return fn.apply(sak, args);
+      }
+      try {
+        const result = await altheia.guard(action, () => fn.apply(sak, args));
+        emit({ method: methodName, action, outcome: "allowed" });
+        return result;
+      } catch (err) {
+        if (err instanceof PolicyDeniedError) {
+          emit({
+            method: methodName,
+            action,
+            outcome: "denied",
+            reason: err.reason,
+            ...(err.reasonCode ? { reasonCode: err.reasonCode } : {}),
+          });
+        } else {
+          const message = err instanceof Error ? err.message : String(err);
+          emit({ method: methodName, action, outcome: "error", error: message });
+        }
+        throw err;
+      }
+    };
+  }
+
   return new Proxy(sak, {
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
       if (typeof value !== "function") return value;
       const methodName = String(prop);
-
-      if (passthrough(methodName)) {
-        return value.bind(target);
-      }
-
-      const mapper = actionMap[methodName];
-      if (!mapper) {
-        return (...args: unknown[]) => {
-          emit({ method: methodName, outcome: "passthrough" });
-          return value.apply(target, args);
-        };
-      }
-
-      return async (...args: unknown[]) => {
-        const action = mapper(args);
-        if (!action) {
-          emit({ method: methodName, outcome: "passthrough" });
-          return value.apply(target, args);
-        }
-        try {
-          const result = await altheia.guard(action, () => value.apply(target, args));
-          emit({ method: methodName, action, outcome: "allowed" });
-          return result;
-        } catch (err) {
-          if (err instanceof PolicyDeniedError) {
-            emit({
-              method: methodName,
-              action,
-              outcome: "denied",
-              reason: err.reason,
-              ...(err.reasonCode ? { reasonCode: err.reasonCode } : {}),
-            });
-          } else {
-            const message = err instanceof Error ? err.message : String(err);
-            emit({ method: methodName, action, outcome: "error", error: message });
-          }
-          throw err;
-        }
-      };
+      const cached = wrapperCache.get(methodName);
+      if (cached) return cached;
+      const wrapped = buildWrapper(methodName, value as Function);
+      wrapperCache.set(methodName, wrapped);
+      return wrapped;
     },
   });
 }
