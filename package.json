@@ -24,7 +24,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\"",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "pnpm build && changeset publish"
+    "release": "pnpm build && changeset publish",
+    "publish:all": "pnpm -r build && pnpm --filter @altheia/types publish --access public --no-git-checks && pnpm --filter @altheia/sdk publish --access public --no-git-checks && pnpm --filter @altheia/solana-agent-kit publish --access public --no-git-checks && pnpm --filter @altheia/mcp publish --access public --no-git-checks"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0",
