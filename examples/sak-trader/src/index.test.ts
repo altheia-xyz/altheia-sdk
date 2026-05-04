@@ -125,3 +125,39 @@ describe("E2E-001 demo agent — allow → deny → allow cycle", () => {
     ]);
   });
 });
+
+describe("real-SAK envelope (resolveSak)", () => {
+  it("returns MockSAK by default (ALTHEIA_USE_MOCKSAK unset)", async () => {
+    const { resolveSak, MockSAK } = await import("./index.js");
+    const { sak, kind } = await resolveSak({});
+    expect(kind).toBe("mock");
+    expect(sak).toBeInstanceOf(MockSAK);
+  });
+
+  it("falls back to MockSAK with warning when ALTHEIA_USE_MOCKSAK=0 but no private key", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const { resolveSak, MockSAK } = await import("./index.js");
+    const { sak, kind } = await resolveSak({ ALTHEIA_USE_MOCKSAK: "0" });
+    expect(kind).toBe("mock");
+    expect(sak).toBeInstanceOf(MockSAK);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/ALTHEIA_DEMO_PRIVATE_KEY missing/),
+    );
+    warnSpy.mockRestore();
+  });
+
+  it("falls back to MockSAK with warning when solana-agent-kit is not installed", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const { resolveSak, MockSAK } = await import("./index.js");
+    const { sak, kind } = await resolveSak({
+      ALTHEIA_USE_MOCKSAK: "0",
+      ALTHEIA_DEMO_PRIVATE_KEY: "test-key",
+    });
+    expect(kind).toBe("mock");
+    expect(sak).toBeInstanceOf(MockSAK);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/real SAK init failed/),
+    );
+    warnSpy.mockRestore();
+  });
+});
