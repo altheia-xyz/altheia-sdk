@@ -237,15 +237,18 @@ export const RegisterAgentRequestSchema = z.object({
   model_commitment: z.string().regex(/^[0-9a-f]{64}$/),
   policy: PolicyObjectSchema,
   substrate: SubstrateSchema.optional(),
+  // Session-key custody: the operator generates a Keypair client-side and
+  // sends ONLY the pubkey. The backend never sees the secret. The pubkey
+  // gets registered as a Swig authority; the operator holds the secret.
+  session_key_pubkey: z.string().min(32).max(44),
 });
 export type RegisterAgentRequest = z.infer<typeof RegisterAgentRequestSchema>;
 
+// Backend no longer returns the session-key secret — it doesn't have it.
+// The shape is kept slim; if a caller needs the pubkey it's already on the
+// embedded AgentObject.
 export const RegisterAgentResponseSchema = z.object({
   agent: AgentObjectSchema,
-  session_key: z.object({
-    pubkey: z.string(),
-    secret_encrypted: z.string(),
-  }),
 });
 export type RegisterAgentResponse = z.infer<typeof RegisterAgentResponseSchema>;
 
