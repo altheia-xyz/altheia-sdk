@@ -178,6 +178,7 @@ describe("@altheia/types", () => {
         framework: "sak",
         model_commitment: SHA256,
         policy: { asset_caps: { [USDC]: { max_per_tx: 100 } } },
+        session_key_pubkey: "11111111111111111111111111111111",
       });
       expect(r.framework).toBe("sak");
     });

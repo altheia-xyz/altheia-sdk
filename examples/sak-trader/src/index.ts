@@ -31,6 +31,7 @@ const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const SOL_MINT = "So11111111111111111111111111111111111111112";
 
 const AGENT_ID = process.env.ALTHEIA_AGENT_ID;
+const ALTHEIA_API_KEY = process.env.ALTHEIA_API_KEY;
 const BACKEND = process.env.ALTHEIA_BACKEND ?? "http://localhost:3001";
 
 /**
@@ -143,13 +144,20 @@ async function main(): Promise<void> {
   if (!AGENT_ID) {
     console.error("missing ALTHEIA_AGENT_ID env var");
     console.error("register an agent in the dashboard first, then re-run with:");
-    console.error("  ALTHEIA_AGENT_ID=<uuid> pnpm demo");
+    console.error("  ALTHEIA_AGENT_ID=<uuid> ALTHEIA_API_KEY=<alth_sk_…> pnpm demo");
+    process.exit(1);
+  }
+  if (!ALTHEIA_API_KEY) {
+    console.error("missing ALTHEIA_API_KEY env var");
+    console.error("get the apiKey from the registration reveal modal in the dashboard.");
+    console.error("(/sdk/agent_check requires Bearer auth — the SDK will fail-open without it,");
+    console.error(" but the kill-switch demo will silently 'allow' everything, which is wrong.)");
     process.exit(1);
   }
   const { sak, kind } = await resolveSak();
   const guarded = withAltheia(
     sak,
-    { agentId: AGENT_ID!, endpoint: BACKEND },
+    { agentId: AGENT_ID!, endpoint: BACKEND, apiKey: ALTHEIA_API_KEY },
     { onAction: emit },
   );
 
