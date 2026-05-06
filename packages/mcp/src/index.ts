@@ -49,7 +49,10 @@ export function createAltheiaMcpServer(config: AltheiaMcpConfig): {
 } {
   const altheia = config.altheia ?? new Altheia(config);
   const endpoint = config.endpoint ?? "https://api.altheia.xyz";
-  const agentId = config.agentId;
+  // Canonical identifier for tool/resource URLs. Prefer the on-chain PDA;
+  // fall back to UUID for legacy callers. The Altheia constructor already
+  // rejected the case where neither is set.
+  const agentId = config.agentPda ?? config.agentId ?? "";
 
   const server = new McpServer(SERVER_INFO, {
     capabilities: {

@@ -23,9 +23,23 @@ import {
 } from "@altheia/types";
 
 export interface AltheiaConfig {
-  /** Identifier for this agent — must match the AgentObject.id from /agents register response. */
-  agentId: string;
-  /** Reserved for production auth. Optional in hackathon scope. */
+  /**
+   * Canonical agent identifier — the AgentAccount PDA on the Identity Program.
+   * Solscan-linkable, on-chain, deterministic. **Preferred over agentId.**
+   *
+   * Either `agentPda` or the legacy `agentId` (DB UUID) must be provided. If
+   * both are set, `agentPda` wins.
+   */
+  agentPda?: string;
+  /**
+   * Legacy DB UUID. Kept for back-compat with code written before the
+   * PDA-as-identity migration. Prefer `agentPda` for new integrations.
+   */
+  agentId?: string;
+  /**
+   * apiKey issued at agent registration (Bearer header for /sdk/agent_check).
+   * Required in production — without it, the route rejects with 401.
+   */
   apiKey?: string;
   /** Backend base URL. Defaults to https://api.altheia.xyz. */
   endpoint?: string;
@@ -41,11 +55,26 @@ export class Altheia {
   private readonly endpoint: string;
   private readonly failureMode: "closed" | "open";
   private readonly timeoutMs: number;
+  // Resolved canonical identifier: PDA if provided, else fall back to UUID.
+  // Backend's /sdk/agent_check accepts both shapes; we send whichever the
+  // operator gave us.
+  private readonly agentRef: string;
+  private readonly agentRefField: "agent_pda" | "agent_id";
 
   constructor(private readonly config: AltheiaConfig) {
     this.endpoint = stripTrailingSlash(config.endpoint ?? "https://api.altheia.xyz");
     this.failureMode = config.failureMode ?? "open";
     this.timeoutMs = config.timeoutMs ?? 1500;
+
+    if (config.agentPda) {
+      this.agentRef = config.agentPda;
+      this.agentRefField = "agent_pda";
+    } else if (config.agentId) {
+      this.agentRef = config.agentId;
+      this.agentRefField = "agent_id";
+    } else {
+      throw new Error("Altheia: either agentPda (preferred) or agentId is required");
+    }
   }
 
   /**
@@ -75,7 +104,7 @@ export class Altheia {
       const res = await this.fetchWithTimeout(`${this.endpoint}/sdk/agent_check`, {
         method: "POST",
         headers: this.headers(),
-        body: JSON.stringify({ agent_id: this.config.agentId, action }),
+        body: JSON.stringify({ [this.agentRefField]: this.agentRef, action }),
       });
       if (!res.ok) {
         return this.handleFailure(new AltheiaConnectionError(`backend returned ${res.status}`));
@@ -98,7 +127,7 @@ export class Altheia {
       await this.fetchWithTimeout(`${this.endpoint}/sdk/agent_report`, {
         method: "POST",
         headers: this.headers(),
-        body: JSON.stringify({ agent_id: this.config.agentId, ...event }),
+        body: JSON.stringify({ [this.agentRefField]: this.agentRef, ...event }),
       });
     } catch (err) {
       // best-effort; surface at warn level so users can see SDK-internal issues without crashing.
@@ -112,7 +141,7 @@ export class Altheia {
       await this.fetchWithTimeout(`${this.endpoint}/sdk/heartbeat`, {
         method: "POST",
         headers: this.headers(),
-        body: JSON.stringify({ agent_id: this.config.agentId, ...status }),
+        body: JSON.stringify({ [this.agentRefField]: this.agentRef, ...status }),
       });
     } catch (err) {
       console.warn("[altheia] ping() failed:", err instanceof Error ? err.message : err);
@@ -121,7 +150,7 @@ export class Altheia {
 
   /** Fetch the current policy in scope for this agent. */
   async policy(): Promise<PolicyObject> {
-    const url = `${this.endpoint}/agents/${this.config.agentId}/policy`;
+    const url = `${this.endpoint}/agents/${this.agentRef}/policy`;
     const res = await fetch(url, { headers: this.headers() });
     if (!res.ok) throw new AltheiaConnectionError(`backend returned ${res.status}`);
     const body = (await res.json()) as { policy: PolicyObject };

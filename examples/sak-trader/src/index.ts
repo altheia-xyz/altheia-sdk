@@ -30,6 +30,9 @@ import { withAltheia, type AdapterEvent } from "@altheia/solana-agent-kit";
 const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const SOL_MINT = "So11111111111111111111111111111111111111112";
 
+// Canonical: AgentAccount PDA (on-chain identity, Solscan-linkable).
+// Legacy: DB UUID. SDK accepts either; prefer PDA when both are set.
+const AGENT_PDA = process.env.ALTHEIA_AGENT_PDA;
 const AGENT_ID = process.env.ALTHEIA_AGENT_ID;
 const ALTHEIA_API_KEY = process.env.ALTHEIA_API_KEY;
 const BACKEND = process.env.ALTHEIA_BACKEND ?? "http://localhost:3001";
@@ -141,10 +144,10 @@ async function step(label: string, fn: () => Promise<unknown>): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  if (!AGENT_ID) {
-    console.error("missing ALTHEIA_AGENT_ID env var");
+  if (!AGENT_PDA && !AGENT_ID) {
+    console.error("missing ALTHEIA_AGENT_PDA (preferred) or ALTHEIA_AGENT_ID env var");
     console.error("register an agent in the dashboard first, then re-run with:");
-    console.error("  ALTHEIA_AGENT_ID=<uuid> ALTHEIA_API_KEY=<alth_sk_…> pnpm demo");
+    console.error("  ALTHEIA_AGENT_PDA=<pda> ALTHEIA_API_KEY=<alth_sk_…> pnpm demo");
     process.exit(1);
   }
   if (!ALTHEIA_API_KEY) {
@@ -157,14 +160,16 @@ async function main(): Promise<void> {
   const { sak, kind } = await resolveSak();
   const guarded = withAltheia(
     sak,
-    { agentId: AGENT_ID!, endpoint: BACKEND, apiKey: ALTHEIA_API_KEY },
+    AGENT_PDA
+      ? { agentPda: AGENT_PDA, endpoint: BACKEND, apiKey: ALTHEIA_API_KEY }
+      : { agentId: AGENT_ID!, endpoint: BACKEND, apiKey: ALTHEIA_API_KEY },
     { onAction: emit },
   );
 
   console.log("┌──────────────────────────────────────────────────────────────");
   console.log("│  Altheia + Solana Agent Kit — E2E-001 demo");
   console.log("├──────────────────────────────────────────────────────────────");
-  console.log(`│  agent_id : ${AGENT_ID}`);
+  console.log(`│  agent     : ${AGENT_PDA ?? AGENT_ID}${AGENT_PDA ? "  (PDA)" : "  (UUID — legacy)"}`);
   console.log(`│  backend  : ${BACKEND}`);
   console.log(`│  sak mode : ${kind === "real" ? "REAL devnet SAK" : "MockSAK (no devnet dep)"}`);
   console.log("│  policy   : USDC max_per_tx 1.0 (set this in the dashboard)");
