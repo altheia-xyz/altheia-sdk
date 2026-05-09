@@ -14,4 +14,4 @@ Pick the affected packages, pick the bump type (patch/minor/major), describe the
 
 CI runs `changeset version` to roll up pending changesets into version bumps + CHANGELOG entries, then `changeset publish` to push to npm.
 
-For Phase 1: manual release until CI is wired up.
+Currently manual release until CI is wired up.

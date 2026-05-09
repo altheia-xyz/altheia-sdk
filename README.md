@@ -131,10 +131,6 @@ Cross-package linking is automatic via `workspace:*` — change `packages/types`
 
 `v0.0.2` — Solana mainnet ready, **unaudited**. The slim Identity Program (~380 lines) reduces blast radius but doesn't replace an audit. Use real money at your own risk; revoke aggressively when in doubt.
 
-## Submission
-
-Built for [Colosseum Frontier 2026](https://www.colosseum.org/). Category: AI Platforms / Agents. Live: [altheia.xyz](https://altheia.xyz).
-
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE). The SDK + MCP server + adapters + types are open source. The backend, dashboard, and audit indexer are closed source.
