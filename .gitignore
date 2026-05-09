@@ -21,3 +21,6 @@ Thumbs.db
 # Local env
 .env
 .env.local
+
+# Karpathy per-repo guidelines (local, not for git)
+CLAUDE.md
