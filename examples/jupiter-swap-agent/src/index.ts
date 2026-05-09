@@ -26,7 +26,7 @@
  * Cost per run: ~0.012 SOL in actual swaps + 2× tx fees. ~$2.50 at $200/SOL.
  */
 
-import { Altheia, PolicyDeniedError } from "@altheia-xyz/sdk";
+import { Altheia, PolicyDeniedError, type ActionDescriptor } from "@altheia-xyz/sdk";
 import { Connection, Keypair, VersionedTransaction } from "@solana/web3.js";
 import bs58 from "bs58";
 
@@ -34,6 +34,11 @@ const SOL_MINT = "So11111111111111111111111111111111111111112";
 const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const JUPITER_V6 = "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4";
 const LAMPORTS_PER_SOL = 1_000_000_000;
+
+// Invariant tracker: counts how many times jupiterSwap actually runs.
+// Demo asserts at the end that this count matches expected (2 — steps 1 + 3).
+// If a denied step's fn() runs, this catches the kill-switch failure visibly.
+let jupiterSwapInvocationCount = 0;
 
 const AGENT_PDA = process.env.ALTHEIA_AGENT_PDA;
 const API_KEY = process.env.ALTHEIA_API_KEY;
@@ -67,6 +72,7 @@ async function jupiterSwap(
   outputMint: string,
   lamports: number,
 ): Promise<string> {
+  jupiterSwapInvocationCount += 1;
   const quote = await jupiterQuote(inputMint, outputMint, lamports);
 
   const swapRes = await fetch("https://quote-api.jup.ag/v6/swap", {
@@ -103,6 +109,31 @@ async function step(label: string, fn: () => Promise<void>): Promise<void> {
   }
 }
 
+/**
+ * Pre-flight check that prints the policy decision before guard() runs.
+ * If the actual decision doesn't match the expected outcome, return false so
+ * the caller can abort the step. Without this, a backend bug that incorrectly
+ * allows an over-cap action would silently land a real swap on chain — i.e.
+ * the kill-switch demo would lie to the audience.
+ */
+async function preFlightCheck(
+  altheia: Altheia,
+  action: ActionDescriptor,
+  expected: "allow" | "deny",
+): Promise<boolean> {
+  const decision = await altheia.check(action);
+  const got = decision.allowed ? "allow" : "deny";
+  const reasonCode = decision.reason_code ?? "—";
+  console.log(`  pre-flight: decision=${got} [${reasonCode}] ${decision.reason ?? ""}`);
+  if (got !== expected) {
+    console.error(`  ⚠️  INVARIANT VIOLATED: expected ${expected}, got ${got}`);
+    console.error(`  ⚠️  Aborting step — refusing to risk a silent demo failure.`);
+    console.error(`  ⚠️  Investigate: backend policy eval, Swig scope sync, API key match.`);
+    return false;
+  }
+  return true;
+}
+
 async function main(): Promise<void> {
   if (!AGENT_PDA || !API_KEY || !KEYPAIR_SECRET) {
     console.error("missing env: ALTHEIA_AGENT_PDA, ALTHEIA_API_KEY, ALTHEIA_DEMO_KEYPAIR");
@@ -123,11 +154,14 @@ async function main(): Promise<void> {
   console.log("│  policy : SOL max_per_tx 0.01, allowed_programs [JUP6Lk…]");
   console.log("└──────────────────────────────────────────────────────────────");
 
+  const action1: ActionDescriptor = { type: "swap", amount: 0.005, asset: "SOL", target: JUPITER_V6 };
+  const action2: ActionDescriptor = { type: "swap", amount: 0.05, asset: "SOL", target: JUPITER_V6 };
+
   // [1] Under-cap swap (0.005 SOL → USDC) — should be ALLOWED, real swap.
   await step("[1] swap 0.005 SOL → USDC (under cap) — should be ALLOWED:", async () => {
-    const sig = await altheia.guard(
-      { type: "swap", amount: 0.005, asset: "SOL", target: JUPITER_V6 },
-      () => jupiterSwap(conn, payer, SOL_MINT, USDC_MINT, 0.005 * LAMPORTS_PER_SOL),
+    if (!(await preFlightCheck(altheia, action1, "allow"))) return;
+    const sig = await altheia.guard(action1, () =>
+      jupiterSwap(conn, payer, SOL_MINT, USDC_MINT, 0.005 * LAMPORTS_PER_SOL),
     );
     console.log(`  ✓ ALLOWED — tx ${sig}`);
     console.log(`    https://solscan.io/tx/${sig}`);
@@ -135,26 +169,39 @@ async function main(): Promise<void> {
 
   // [2] Over-cap swap (0.05 SOL → USDC) — should be DENIED, no tx.
   await step("[2] swap 0.05 SOL → USDC (5× over cap) — should be DENIED:", async () => {
-    await altheia.guard(
-      { type: "swap", amount: 0.05, asset: "SOL", target: JUPITER_V6 },
-      () => jupiterSwap(conn, payer, SOL_MINT, USDC_MINT, 0.05 * LAMPORTS_PER_SOL),
+    if (!(await preFlightCheck(altheia, action2, "deny"))) return;
+    await altheia.guard(action2, () =>
+      jupiterSwap(conn, payer, SOL_MINT, USDC_MINT, 0.05 * LAMPORTS_PER_SOL),
     );
   });
 
   // [3] Under-cap swap again — agent still healthy after deny.
   await step("[3] swap 0.005 SOL → USDC again — agent stays healthy after deny:", async () => {
-    const sig = await altheia.guard(
-      { type: "swap", amount: 0.005, asset: "SOL", target: JUPITER_V6 },
-      () => jupiterSwap(conn, payer, SOL_MINT, USDC_MINT, 0.005 * LAMPORTS_PER_SOL),
+    if (!(await preFlightCheck(altheia, action1, "allow"))) return;
+    const sig = await altheia.guard(action1, () =>
+      jupiterSwap(conn, payer, SOL_MINT, USDC_MINT, 0.005 * LAMPORTS_PER_SOL),
     );
     console.log(`  ✓ ALLOWED — tx ${sig}`);
     console.log(`    https://solscan.io/tx/${sig}`);
   });
 
+  // Kill-switch invariant: jupiterSwap should have run exactly twice (steps 1 + 3).
+  // If it ran 3 times, step [2]'s fn() executed despite the deny — kill switch failed.
+  // If it ran 0 or 1 times, the demo's allowed steps didn't actually swap on chain.
   console.log("\n┌──────────────────────────────────────────────────────────────");
-  console.log("│  done. open the chronicle:");
+  console.log("│  invariant check: jupiterSwap fn() was called " + jupiterSwapInvocationCount + " time(s)");
+  if (jupiterSwapInvocationCount === 2) {
+    console.log("│  ✓ kill-switch held: denied step's fn() did NOT run");
+  } else {
+    console.error("│  ⚠️  KILL-SWITCH INVARIANT VIOLATED: expected 2 calls, got " + jupiterSwapInvocationCount);
+    console.error("│  ⚠️  Either a denied step ran fn(), or an allowed step didn't.");
+    console.error("│  ⚠️  Do NOT publish this demo recording.");
+    process.exitCode = 1;
+  }
+  console.log("├──────────────────────────────────────────────────────────────");
+  console.log("│  open the chronicle:");
   console.log(`│    https://altheia.xyz/agents/${AGENT_PDA}`);
-  console.log("│  expect: 2 action_allowed rows (with real signatures), 1 action_denied row");
+  console.log("│  expect: 2 action_allowed rows (with real sigs), 1 action_denied row");
   console.log("└──────────────────────────────────────────────────────────────\n");
 }
 
