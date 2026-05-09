@@ -1,5 +1,5 @@
 /**
- * @altheia/solana-agent-kit — gate every Solana Agent Kit (SAK) action through Altheia.
+ * @altheia-xyz/solana-agent-kit — gate every Solana Agent Kit (SAK) action through Altheia.
  *
  * Wraps a SAK instance so action methods (transfer, trade, etc.) go through
  * `altheia.guard()` — pre-flight policy check + audit emission + on-chain
@@ -10,7 +10,7 @@
  * Usage:
  *
  *   import { SolanaAgentKit } from "solana-agent-kit";
- *   import { withAltheia } from "@altheia/solana-agent-kit";
+ *   import { withAltheia } from "@altheia-xyz/solana-agent-kit";
  *
  *   const sak = new SolanaAgentKit(privateKey, rpcUrl);
  *   const agent = withAltheia(sak, { agentId: process.env.ALTHEIA_AGENT_ID! });
@@ -25,7 +25,7 @@ import {
   type AltheiaConfig,
   type ActionDescriptor,
   PolicyDeniedError,
-} from "@altheia/sdk";
+} from "@altheia-xyz/sdk";
 
 type ActionMapper = (args: unknown[]) => ActionDescriptor | null;
 
@@ -159,5 +159,5 @@ export function withAltheia<T extends object>(
   });
 }
 
-export { Altheia, PolicyDeniedError } from "@altheia/sdk";
-export type { AltheiaConfig, ActionDescriptor } from "@altheia/sdk";
+export { Altheia, PolicyDeniedError } from "@altheia-xyz/sdk";
+export type { AltheiaConfig, ActionDescriptor } from "@altheia-xyz/sdk";

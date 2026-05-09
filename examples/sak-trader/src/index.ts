@@ -25,7 +25,7 @@
  *   5. Watch chronicle in dashboard — denied row appears within 1s.
  */
 
-import { withAltheia, type AdapterEvent } from "@altheia/solana-agent-kit";
+import { withAltheia, type AdapterEvent } from "@altheia-xyz/solana-agent-kit";
 
 const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const SOL_MINT = "So11111111111111111111111111111111111111112";
@@ -88,7 +88,7 @@ export async function resolveSak(env: NodeJS.ProcessEnv = process.env): Promise<
   const rpcUrl = env.ALTHEIA_DEMO_RPC_URL ?? "https://api.devnet.solana.com";
   try {
     // Dynamic import so the package isn't a hard dep — recording-day install:
-    //   pnpm --filter @altheia/example-sak-trader add solana-agent-kit
+    //   pnpm --filter @altheia-xyz/example-sak-trader add solana-agent-kit
     // @ts-expect-error — package is intentionally not in deps; resolved at runtime
     const mod = (await import("solana-agent-kit")) as {
       SolanaAgentKit: new (privateKey: string, rpcUrl: string, openAiKey?: string) => SakLike;

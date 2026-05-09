@@ -16,12 +16,12 @@ This monorepo holds the four open-source TypeScript packages developers install.
 
 | Package | Status | Description |
 |---|---|---|
-| [`@altheia/sdk`](packages/sdk) | `0.0.1-alpha` | Core SDK — `guard()`, `check()`, `report()`, `ping()`, `policy()` |
-| [`@altheia/mcp`](packages/mcp) | `0.0.1-alpha` | Standalone MCP server — connects Claude Desktop, Cursor, ChatGPT to your agent fleet |
-| [`@altheia/solana-agent-kit`](packages/solana-agent-kit) | `0.0.1-alpha` | Adapter for [Solana Agent Kit](https://github.com/sendaifun/solana-agent-kit) (SendAI) |
-| [`@altheia/types`](packages/types) | `0.0.1-alpha` | Shared TypeScript types + zod schemas |
+| [`@altheia-xyz/sdk`](packages/sdk) | `0.0.1-alpha` | Core SDK — `guard()`, `check()`, `report()`, `ping()`, `policy()` |
+| [`@altheia-xyz/mcp`](packages/mcp) | `0.0.1-alpha` | Standalone MCP server — connects Claude Desktop, Cursor, ChatGPT to your agent fleet |
+| [`@altheia-xyz/solana-agent-kit`](packages/solana-agent-kit) | `0.0.1-alpha` | Adapter for [Solana Agent Kit](https://github.com/sendaifun/solana-agent-kit) (SendAI) |
+| [`@altheia-xyz/types`](packages/types) | `0.0.1-alpha` | Shared TypeScript types + zod schemas |
 
-Phase 1.5: an `@altheia/eliza-plugin` adapter lands later (Eliza demoted from Phase 1).
+Phase 1.5: an `@altheia-xyz/eliza-plugin` adapter lands later (Eliza demoted from Phase 1).
 
 ## Local dev
 

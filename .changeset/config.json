@@ -3,7 +3,7 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [["@altheia/sdk", "@altheia/mcp", "@altheia/solana-agent-kit", "@altheia/types"]],
+  "linked": [["@altheia-xyz/sdk", "@altheia-xyz/mcp", "@altheia-xyz/solana-agent-kit", "@altheia-xyz/types"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",

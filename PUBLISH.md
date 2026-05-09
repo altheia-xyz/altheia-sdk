@@ -4,10 +4,10 @@ Four packages publish under the `@altheia` scope:
 
 | Package | Depends on |
 |---|---|
-| `@altheia/types` | nothing |
-| `@altheia/sdk` | `@altheia/types` |
-| `@altheia/solana-agent-kit` | `@altheia/sdk`, `@altheia/types` |
-| `@altheia/mcp` | `@altheia/sdk`, `@altheia/types`, `@modelcontextprotocol/sdk` |
+| `@altheia-xyz/types` | nothing |
+| `@altheia-xyz/sdk` | `@altheia-xyz/types` |
+| `@altheia-xyz/solana-agent-kit` | `@altheia-xyz/sdk`, `@altheia-xyz/types` |
+| `@altheia-xyz/mcp` | `@altheia-xyz/sdk`, `@altheia-xyz/types`, `@modelcontextprotocol/sdk` |
 
 Order matters: dependents publish after their dependencies.
 
@@ -49,23 +49,23 @@ Flags:
 
 ```bash
 # Confirm each package is on npm
-npm view @altheia/types version
-npm view @altheia/sdk version
-npm view @altheia/solana-agent-kit version
-npm view @altheia/mcp version
+npm view @altheia-xyz/types version
+npm view @altheia-xyz/sdk version
+npm view @altheia-xyz/solana-agent-kit version
+npm view @altheia-xyz/mcp version
 
 # Smoke-test the MCP server
 ALTHEIA_AGENT_ID=00000000-0000-0000-0000-000000000000 \
 ALTHEIA_BACKEND=http://localhost:3001 \
-npx -y @altheia/mcp
+npx -y @altheia-xyz/mcp
 ```
 
-`npx -y @altheia/mcp` should print the missing-agent-id error or boot
+`npx -y @altheia-xyz/mcp` should print the missing-agent-id error or boot
 silently if all env vars are set.
 
 ## After publish
 
-The landing page's Integrations band copy ("`npx @altheia/mcp`") becomes
+The landing page's Integrations band copy ("`npx @altheia-xyz/mcp`") becomes
 truthful for the first time. Update the demo recording script if needed.
 
 ## Versioning during the hackathon

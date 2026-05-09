@@ -8,7 +8,7 @@
  */
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { withAltheia, PolicyDeniedError } from "@altheia/solana-agent-kit";
+import { withAltheia, PolicyDeniedError } from "@altheia-xyz/solana-agent-kit";
 
 const AGENT_ID = "11111111-1111-1111-1111-111111111111";
 const AUDIT_ID = "22222222-2222-2222-2222-222222222222";

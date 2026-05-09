@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { withAltheia, type AdapterEvent } from "./index.js";
-import { Altheia, PolicyDeniedError } from "@altheia/sdk";
+import { Altheia, PolicyDeniedError } from "@altheia-xyz/sdk";
 
 const AGENT_ID = "11111111-1111-1111-1111-111111111111";
 const AUDIT_ID = "22222222-2222-2222-2222-222222222222";

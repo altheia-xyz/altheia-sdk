@@ -20,10 +20,10 @@ importers:
 
   examples/sak-trader:
     dependencies:
-      '@altheia/sdk':
+      '@altheia-xyz/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
-      '@altheia/solana-agent-kit':
+      '@altheia-xyz/solana-agent-kit':
         specifier: workspace:*
         version: link:../../packages/solana-agent-kit
     devDependencies:
@@ -39,10 +39,10 @@ importers:
 
   packages/mcp:
     dependencies:
-      '@altheia/sdk':
+      '@altheia-xyz/sdk':
         specifier: workspace:*
         version: link:../sdk
-      '@altheia/types':
+      '@altheia-xyz/types':
         specifier: workspace:*
         version: link:../types
       '@modelcontextprotocol/sdk':
@@ -67,7 +67,7 @@ importers:
 
   packages/sdk:
     dependencies:
-      '@altheia/types':
+      '@altheia-xyz/types':
         specifier: workspace:*
         version: link:../types
       zod:
@@ -86,10 +86,10 @@ importers:
 
   packages/solana-agent-kit:
     dependencies:
-      '@altheia/sdk':
+      '@altheia-xyz/sdk':
         specifier: workspace:*
         version: link:../sdk
-      '@altheia/types':
+      '@altheia-xyz/types':
         specifier: workspace:*
         version: link:../types
       solana-agent-kit:

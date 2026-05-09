@@ -1,5 +1,5 @@
 /**
- * @altheia/mcp — standalone MCP server.
+ * @altheia-xyz/mcp — standalone MCP server.
  *
  * Exposes Altheia tools + resources to any MCP-aware client (Claude Desktop,
  * Cursor, ChatGPT). The LLM operates against your agent fleet through these
@@ -23,8 +23,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import { z } from "zod";
-import { Altheia, PolicyDeniedError, type AltheiaConfig } from "@altheia/sdk";
-import type { AgentObject } from "@altheia/types";
+import { Altheia, PolicyDeniedError, type AltheiaConfig } from "@altheia-xyz/sdk";
+import type { AgentObject } from "@altheia-xyz/types";
 
 export interface AltheiaMcpConfig extends AltheiaConfig {
   /** Optional override for the underlying Altheia HTTP client (for tests). */
@@ -39,7 +39,7 @@ const SERVER_INFO = {
 /**
  * Build (but don't start) an MCP server wired to an Altheia client.
  * Caller chooses transport (`server.connect(transport)`) — typically
- * `StdioServerTransport()` for `npx @altheia/mcp` use, or an in-memory pair
+ * `StdioServerTransport()` for `npx @altheia-xyz/mcp` use, or an in-memory pair
  * for tests.
  */
 export function createAltheiaMcpServer(config: AltheiaMcpConfig): {
@@ -341,5 +341,5 @@ async function fetchAuditEventsRaw(
   return body.events;
 }
 
-export { Altheia, PolicyDeniedError } from "@altheia/sdk";
-export type { AltheiaConfig } from "@altheia/sdk";
+export { Altheia, PolicyDeniedError } from "@altheia-xyz/sdk";
+export type { AltheiaConfig } from "@altheia-xyz/sdk";

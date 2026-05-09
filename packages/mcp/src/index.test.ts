@@ -13,7 +13,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { Altheia } from "@altheia/sdk";
+import { Altheia } from "@altheia-xyz/sdk";
 import { createAltheiaMcpServer } from "./index.js";
 
 const AGENT_ID = "11111111-1111-1111-1111-111111111111";
@@ -67,7 +67,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("@altheia/mcp server", () => {
+describe("@altheia-xyz/mcp server", () => {
   describe("tool discovery", () => {
     it("registers all 5 tools", async () => {
       globalThis.fetch = mockFetch({}) as never;

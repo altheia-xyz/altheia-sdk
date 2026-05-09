@@ -1,5 +1,5 @@
 {
-  "name": "@altheia/solana-agent-kit",
+  "name": "@altheia-xyz/solana-agent-kit",
   "version": "0.0.1",
   "description": "Altheia adapter for Solana Agent Kit (SendAI) — gate every SAK action with Altheia policy + audit.",
   "license": "Apache-2.0",
@@ -31,8 +31,8 @@
     "solana-agent-kit": ">=2.0.0"
   },
   "dependencies": {
-    "@altheia/sdk": "workspace:*",
-    "@altheia/types": "workspace:*"
+    "@altheia-xyz/sdk": "workspace:*",
+    "@altheia-xyz/types": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

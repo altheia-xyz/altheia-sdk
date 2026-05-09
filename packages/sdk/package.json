@@ -1,5 +1,5 @@
 {
-  "name": "@altheia/sdk",
+  "name": "@altheia-xyz/sdk",
   "version": "0.0.1",
   "description": "Altheia SDK — gate AI agent actions with on-chain-enforced policy. The trust layer for crypto AI agents.",
   "license": "Apache-2.0",
@@ -28,7 +28,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@altheia/types": "workspace:*",
+    "@altheia-xyz/types": "workspace:*",
     "zod": "^3.23.0"
   },
   "devDependencies": {

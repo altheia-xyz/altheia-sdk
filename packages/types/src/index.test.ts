@@ -27,7 +27,7 @@ const SHA256 = "a".repeat(64);
 const UUID = "11111111-2222-3333-4444-555555555555";
 const NOW = new Date().toISOString();
 
-describe("@altheia/types", () => {
+describe("@altheia-xyz/types", () => {
   describe("ActionDescriptor", () => {
     it("parses a minimal transfer action", () => {
       const r = ActionDescriptorSchema.parse({ type: "transfer", amount: 100 });

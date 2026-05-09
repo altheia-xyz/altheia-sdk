@@ -1,5 +1,5 @@
 {
-  "name": "@altheia/example-sak-trader",
+  "name": "@altheia-xyz/example-sak-trader",
   "version": "0.0.1",
   "private": true,
   "description": "E2E-001: sample agent that uses the Solana Agent Kit through Altheia. Demonstrates the allow → deny → allow cycle with a real ALTHEIA_AGENT_ID against a running backend.",
@@ -11,8 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@altheia/sdk": "workspace:*",
-    "@altheia/solana-agent-kit": "workspace:*"
+    "@altheia-xyz/sdk": "workspace:*",
+    "@altheia-xyz/solana-agent-kit": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.19.0",

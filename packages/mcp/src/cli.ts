@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * altheia-mcp — entry point for `npx @altheia/mcp` and the MCP client config.
+ * altheia-mcp — entry point for `npx @altheia-xyz/mcp` and the MCP client config.
  *
  * Reads ALTHEIA_AGENT_ID (required), ALTHEIA_API_KEY (optional, for auth),
  * ALTHEIA_BACKEND (optional, defaults to https://api.altheia.xyz). Starts an
@@ -12,7 +12,7 @@
  *     "mcpServers": {
  *       "altheia": {
  *         "command": "npx",
- *         "args": ["-y", "@altheia/mcp"],
+ *         "args": ["-y", "@altheia-xyz/mcp"],
  *         "env": {
  *           "ALTHEIA_AGENT_ID": "<uuid from dashboard>",
  *           "ALTHEIA_BACKEND": "http://localhost:3001"

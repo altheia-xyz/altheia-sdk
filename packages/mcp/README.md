@@ -1,4 +1,4 @@
-# `@altheia/mcp`
+# `@altheia-xyz/mcp`
 
 Standalone [MCP (Model Context Protocol)](https://modelcontextprotocol.io)
 server that exposes [Altheia](https://altheia.xyz)'s policy + audit layer to
@@ -13,7 +13,7 @@ out-of-policy signatures.
 ## Install + run
 
 ```bash
-npx -y @altheia/mcp
+npx -y @altheia-xyz/mcp
 ```
 
 Required env:
@@ -51,7 +51,7 @@ Required env:
   "mcpServers": {
     "altheia": {
       "command": "npx",
-      "args": ["-y", "@altheia/mcp"],
+      "args": ["-y", "@altheia-xyz/mcp"],
       "env": {
         "ALTHEIA_AGENT_ID": "<uuid from your dashboard>",
         "ALTHEIA_BACKEND": "http://localhost:3001"
@@ -73,7 +73,7 @@ Restart Claude Desktop. The five tools appear in any new chat. Try:
   "mcpServers": {
     "altheia": {
       "command": "npx",
-      "args": ["-y", "@altheia/mcp"],
+      "args": ["-y", "@altheia-xyz/mcp"],
       "env": {
         "ALTHEIA_AGENT_ID": "<uuid>",
         "ALTHEIA_BACKEND": "http://localhost:3001"

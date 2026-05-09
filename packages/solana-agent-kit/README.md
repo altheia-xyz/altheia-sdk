@@ -1,18 +1,18 @@
-# `@altheia/solana-agent-kit`
+# `@altheia-xyz/solana-agent-kit`
 
 Altheia adapter for [Solana Agent Kit](https://github.com/sendaifun/solana-agent-kit) (SendAI). Wraps a SAK instance so every action — swap, transfer, deposit, borrow, mint, etc. — is gated by Altheia policy and recorded in the audit trail.
 
 ## Install
 
 ```bash
-pnpm add solana-agent-kit @altheia/solana-agent-kit
+pnpm add solana-agent-kit @altheia-xyz/solana-agent-kit
 ```
 
 ## Use
 
 ```ts
 import { SolanaAgentKit } from "solana-agent-kit";
-import { withAltheia } from "@altheia/solana-agent-kit";
+import { withAltheia } from "@altheia-xyz/solana-agent-kit";
 
 const agent = withAltheia(
   new SolanaAgentKit({

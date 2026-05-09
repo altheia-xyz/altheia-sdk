@@ -1,5 +1,5 @@
 /**
- * @altheia/sdk — gate AI agent actions with on-chain-enforced policy.
+ * @altheia-xyz/sdk — gate AI agent actions with on-chain-enforced policy.
  *
  * Wrap your agent's actions with `altheia.guard()` and they're checked
  * against your operator policy (off-chain pre-flight via the Altheia
@@ -20,7 +20,7 @@ import {
   type PolicyObject,
   PolicyDeniedError,
   AltheiaConnectionError,
-} from "@altheia/types";
+} from "@altheia-xyz/types";
 
 export interface AltheiaConfig {
   /**
@@ -194,5 +194,5 @@ function stripTrailingSlash(s: string): string {
   return s.endsWith("/") ? s.slice(0, -1) : s;
 }
 
-export type { ActionDescriptor, Decision, PolicyObject } from "@altheia/types";
-export { PolicyDeniedError, AltheiaConnectionError } from "@altheia/types";
+export type { ActionDescriptor, Decision, PolicyObject } from "@altheia-xyz/types";
+export { PolicyDeniedError, AltheiaConnectionError } from "@altheia-xyz/types";

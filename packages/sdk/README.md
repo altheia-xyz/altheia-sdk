@@ -1,4 +1,4 @@
-# `@altheia/sdk`
+# `@altheia-xyz/sdk`
 
 The TypeScript SDK for [Altheia](https://altheia.xyz) — the trust + audit layer for AI agents on Solana.
 
@@ -7,13 +7,13 @@ Wrap your agent's actions with `altheia.guard()` and they're checked against you
 ## Install
 
 ```bash
-pnpm add @altheia/sdk
+pnpm add @altheia-xyz/sdk
 ```
 
 ## Use
 
 ```ts
-import { Altheia } from "@altheia/sdk";
+import { Altheia } from "@altheia-xyz/sdk";
 
 const altheia = new Altheia({
   apiKey: process.env.ALTHEIA_API_KEY!,

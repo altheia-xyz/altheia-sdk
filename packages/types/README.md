@@ -1,11 +1,11 @@
-# `@altheia/types`
+# `@altheia-xyz/types`
 
 Shared TypeScript types + zod schemas for the Altheia trust layer.
 
-Consumed internally by [`@altheia/sdk`](../sdk/), [`@altheia/mcp`](../mcp/), [`@altheia/solana-agent-kit`](../solana-agent-kit/), and the closed-source backend.
+Consumed internally by [`@altheia-xyz/sdk`](../sdk/), [`@altheia-xyz/mcp`](../mcp/), [`@altheia-xyz/solana-agent-kit`](../solana-agent-kit/), and the closed-source backend.
 
 ```bash
-pnpm add @altheia/types zod
+pnpm add @altheia-xyz/types zod
 ```
 
 ```ts
@@ -15,7 +15,7 @@ import {
   ActionDescriptor,
   Decision,
   PolicyDeniedError,
-} from "@altheia/types";
+} from "@altheia-xyz/types";
 ```
 
 License: Apache-2.0.
