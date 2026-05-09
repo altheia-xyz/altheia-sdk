@@ -1,5 +1,7 @@
 # `@altheia-xyz/mcp`
 
+**AI agents you can fire — MCP server.**
+
 Standalone [MCP (Model Context Protocol)](https://modelcontextprotocol.io)
 server that exposes [Altheia](https://altheia.xyz)'s policy + audit layer to
 any MCP-aware client (Claude Desktop, Cursor, ChatGPT, custom agents).
@@ -21,7 +23,7 @@ Required env:
 | Var | Required | Default |
 |---|---|---|
 | `ALTHEIA_AGENT_ID` | yes | — |
-| `ALTHEIA_BACKEND` | no | `https://api.altheia.xyz` |
+| `ALTHEIA_BACKEND` | no | `https://api.altheia.xyz` (defaults to prod — set only for self-hosting) |
 | `ALTHEIA_API_KEY` | no (Phase 1.5) | — |
 
 ## Tools
@@ -54,7 +56,7 @@ Required env:
       "args": ["-y", "@altheia-xyz/mcp"],
       "env": {
         "ALTHEIA_AGENT_ID": "<uuid from your dashboard>",
-        "ALTHEIA_BACKEND": "http://localhost:3001"
+        "ALTHEIA_BACKEND": "https://api.altheia.xyz"
       }
     }
   }
@@ -76,7 +78,7 @@ Restart Claude Desktop. The five tools appear in any new chat. Try:
       "args": ["-y", "@altheia-xyz/mcp"],
       "env": {
         "ALTHEIA_AGENT_ID": "<uuid>",
-        "ALTHEIA_BACKEND": "http://localhost:3001"
+        "ALTHEIA_BACKEND": "https://api.altheia.xyz"
       }
     }
   }
@@ -111,7 +113,7 @@ cron + Helius webhook retries once the backend recovers.
 cd packages/mcp
 pnpm install
 pnpm build
-ALTHEIA_AGENT_ID=<uuid> ALTHEIA_BACKEND=http://localhost:3001 node dist/cli.js
+ALTHEIA_AGENT_ID=<uuid> node dist/cli.js  # ALTHEIA_BACKEND defaults to https://api.altheia.xyz
 ```
 
 ## Tests

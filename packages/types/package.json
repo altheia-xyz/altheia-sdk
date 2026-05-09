@@ -1,7 +1,7 @@
 {
   "name": "@altheia-xyz/types",
-  "version": "0.0.1",
-  "description": "Shared TypeScript types + zod schemas for the Altheia trust layer.",
+  "version": "0.0.2",
+  "description": "AI agents you can fire — shared TypeScript types + zod schemas for Altheia.",
   "license": "Apache-2.0",
   "homepage": "https://altheia.xyz",
   "repository": {

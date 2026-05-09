@@ -1,5 +1,5 @@
 /**
- * @altheia-xyz/types — shared TypeScript types + zod schemas for the Altheia trust layer.
+ * @altheia-xyz/types — shared TypeScript types + zod schemas for Altheia.
  *
  * Consumed by @altheia-xyz/sdk, @altheia-xyz/mcp, @altheia-xyz/solana-agent-kit,
  * and the (closed-source) altheia-backend.

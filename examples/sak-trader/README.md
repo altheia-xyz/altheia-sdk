@@ -1,6 +1,6 @@
-# sak-trader — Altheia + Solana Agent Kit demo (E2E-001)
+# sak-trader — AI agent you can fire (Solana Agent Kit demo)
 
-A 50-line agent that proves Altheia's kill-switch works at the SDK layer.
+A 50-line agent that proves Altheia's kill switch works at the SDK layer.
 
 It runs three actions in sequence:
 
@@ -22,7 +22,8 @@ never signs**. The deny happens before SAK touches the chain.
 # 2. Copy the agent_id from the dashboard URL
 
 # 3. Run the demo
-ALTHEIA_AGENT_ID=<uuid> ALTHEIA_BACKEND=http://localhost:3001 pnpm demo
+ALTHEIA_AGENT_PDA=<pda> ALTHEIA_API_KEY=<alth_sk_…> pnpm demo
+# ALTHEIA_BACKEND defaults to https://api.altheia.xyz — set only for self-hosting
 ```
 
 Output looks like:
@@ -50,8 +51,9 @@ real SAK:
 ```ts
 const sak = new MockSAK();              // or: new SolanaAgentKit(privateKey, rpc)
 const guarded = withAltheia(sak, {
-  agentId: process.env.ALTHEIA_AGENT_ID!,
-  endpoint: process.env.ALTHEIA_BACKEND ?? "http://localhost:3001",
+  agentPda: process.env.ALTHEIA_AGENT_PDA!,
+  apiKey:   process.env.ALTHEIA_API_KEY!,
+  // endpoint defaults to https://api.altheia.xyz
 }, {
   onAction: (e) => { /* log allow/deny/passthrough */ },
 });

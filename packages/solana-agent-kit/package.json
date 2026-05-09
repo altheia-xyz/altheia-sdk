@@ -1,7 +1,7 @@
 {
   "name": "@altheia-xyz/solana-agent-kit",
-  "version": "0.0.1",
-  "description": "Altheia adapter for Solana Agent Kit (SendAI) — gate every SAK action with Altheia policy + audit.",
+  "version": "0.0.2",
+  "description": "AI agents you can fire — Altheia adapter for Solana Agent Kit (SendAI). Gates every SAK action with Altheia policy + audit.",
   "license": "Apache-2.0",
   "homepage": "https://altheia.xyz",
   "repository": {

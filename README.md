@@ -1,25 +1,29 @@
 # Altheia SDK
 
-*Open-source TypeScript packages for the [Altheia](https://altheia.xyz) trust layer — SDK, MCP server, framework adapters, and shared types.*
+**AI agents you can fire.**
+
+*Open-source TypeScript packages for [Altheia](https://altheia.xyz) — SDK, MCP server, framework adapters, shared types.*
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Node 22](https://img.shields.io/badge/Node-22-339933.svg)](https://nodejs.org)
-[![pnpm 9](https://img.shields.io/badge/pnpm-9-F69220.svg)](https://pnpm.io)
+[![pnpm 10](https://img.shields.io/badge/pnpm-10-F69220.svg)](https://pnpm.io)
 
 ## What this is
 
-Altheia is the trust + audit layer for AI agents on Solana — register your agent, set a per-mint policy, and every action it takes goes through Altheia (off-chain pre-flight via SDK) and on-chain enforcement (via [Swig](https://github.com/anagrambuild/swig-wallet) session-key scope: `TokenRecurringLimit`, `ProgramScope`, etc.). One click revokes the agent permanently.
+Register your agent at [altheia.xyz](https://altheia.xyz), set a per-action policy (asset caps, allowed programs, kill switch), and every action your agent takes goes through Altheia — off-chain pre-flight via the SDK, on-chain enforcement via [Swig](https://github.com/anagrambuild/swig-wallet) session-key scope (`TokenRecurringLimit`, `ProgramScope`, etc).
 
-This monorepo holds the four open-source TypeScript packages developers install. The closed-source backend, dashboard, and audit indexer live elsewhere.
+Revoke in one click. The wallet stops signing immediately. No key rotation, no downtime.
+
+This monorepo holds the four open-source TypeScript packages developers install. The backend, dashboard, and on-chain identity program live elsewhere.
 
 ## Packages
 
-| Package | Status | Description |
+| Package | Version | Description |
 |---|---|---|
-| [`@altheia-xyz/sdk`](packages/sdk) | `0.0.1-alpha` | Core SDK — `guard()`, `check()`, `report()`, `ping()`, `policy()` |
-| [`@altheia-xyz/mcp`](packages/mcp) | `0.0.1-alpha` | Standalone MCP server — connects Claude Desktop, Cursor, ChatGPT to your agent fleet |
-| [`@altheia-xyz/solana-agent-kit`](packages/solana-agent-kit) | `0.0.1-alpha` | Adapter for [Solana Agent Kit](https://github.com/sendaifun/solana-agent-kit) (SendAI) |
-| [`@altheia-xyz/types`](packages/types) | `0.0.1-alpha` | Shared TypeScript types + zod schemas |
+| [`@altheia-xyz/sdk`](packages/sdk) | `0.0.2` | Core SDK — `guard()`, `check()`, `report()`, `ping()`, `policy()` |
+| [`@altheia-xyz/mcp`](packages/mcp) | `0.0.2` | Standalone MCP server — connects Claude Desktop, Cursor, ChatGPT to your agent fleet |
+| [`@altheia-xyz/solana-agent-kit`](packages/solana-agent-kit) | `0.0.2` | Adapter for [Solana Agent Kit](https://github.com/sendaifun/solana-agent-kit) (SendAI) |
+| [`@altheia-xyz/types`](packages/types) | `0.0.2` | Shared TypeScript types + zod schemas |
 
 Phase 1.5: an `@altheia-xyz/eliza-plugin` adapter lands later (Eliza demoted from Phase 1).
 

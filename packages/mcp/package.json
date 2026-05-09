@@ -1,7 +1,7 @@
 {
   "name": "@altheia-xyz/mcp",
-  "version": "0.0.1",
-  "description": "Altheia MCP server — gate AI agent actions through any MCP-aware client (Claude Desktop, Cursor, ChatGPT).",
+  "version": "0.0.2",
+  "description": "AI agents you can fire — Altheia MCP server. Connects Claude Desktop, Cursor, ChatGPT to your gated agent fleet.",
   "license": "Apache-2.0",
   "homepage": "https://altheia.xyz",
   "repository": {

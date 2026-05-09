@@ -1,7 +1,7 @@
 {
   "name": "@altheia-xyz/sdk",
-  "version": "0.0.1",
-  "description": "Altheia SDK — gate AI agent actions with on-chain-enforced policy. The trust layer for crypto AI agents.",
+  "version": "0.0.2",
+  "description": "AI agents you can fire — Altheia SDK. Per-action policy, on-chain Swig session keys, one-click revoke. For AI agents on Solana.",
   "license": "Apache-2.0",
   "homepage": "https://altheia.xyz",
   "repository": {

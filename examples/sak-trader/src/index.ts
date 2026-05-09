@@ -35,7 +35,7 @@ const SOL_MINT = "So11111111111111111111111111111111111111112";
 const AGENT_PDA = process.env.ALTHEIA_AGENT_PDA;
 const AGENT_ID = process.env.ALTHEIA_AGENT_ID;
 const ALTHEIA_API_KEY = process.env.ALTHEIA_API_KEY;
-const BACKEND = process.env.ALTHEIA_BACKEND ?? "http://localhost:3001";
+const BACKEND = process.env.ALTHEIA_BACKEND ?? "https://api.altheia.xyz";
 
 /**
  * MockSAK — a minimal fake of the SAK shape that logs to console instead of
