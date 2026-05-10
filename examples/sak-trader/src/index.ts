@@ -13,7 +13,7 @@
  *                                     On any init failure (package missing,
  *                                     bad RPC, bad key) falls back to MockSAK
  *                                     with a console warning so the demo
- *                                     never hard-fails on recording day.
+ *                                     never hard-fails.
  *
  * Usage:
  *   1. Register an agent in the dashboard with policy:

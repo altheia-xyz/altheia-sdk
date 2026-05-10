@@ -88,4 +88,4 @@ Add an `npm` token to GitHub Actions:
 2. Add as `NPM_TOKEN` repo secret
 3. CI step: `npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN && pnpm -r publish --access public --no-git-checks`
 
-This is Phase 2 polish; not needed for the hackathon submission.
+CI publish wiring is a follow-up; manual `pnpm publish` per package works for now.

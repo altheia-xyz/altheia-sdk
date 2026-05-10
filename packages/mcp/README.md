@@ -24,7 +24,7 @@ Required env:
 |---|---|---|
 | `ALTHEIA_AGENT_ID` | yes | — |
 | `ALTHEIA_BACKEND` | no | `https://api.altheia.xyz` (defaults to prod — set only for self-hosting) |
-| `ALTHEIA_API_KEY` | no (Phase 1.5) | — |
+| `ALTHEIA_API_KEY` | yes (in production) | — |
 
 ## Tools
 
@@ -130,6 +130,6 @@ success + error paths, agent metadata resource read.
 
 ## Status
 
-`v0.0.1` — Phase 1 hackathon scaffold. Real auth + retry/cache pass land in Phase 1.5 (SDK-005, SDK-010).
+`v0.0.2` — alpha. Mainnet ready (unaudited).
 
 License: Apache-2.0.
