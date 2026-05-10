@@ -10,7 +10,7 @@
 
 ## What this is
 
-Register your agent at [altheia.xyz](https://altheia.xyz), set a per-action policy (asset caps, allowed programs, kill switch), and every action your agent takes goes through Altheia — off-chain pre-flight via the SDK, on-chain enforcement via [Swig](https://github.com/anagrambuild/swig-wallet) session-key scope (`TokenRecurringLimit`, `ProgramScope`, etc).
+Register your agent at [altheia.xyz](https://altheia.xyz), set a per-action policy (asset caps, allowed programs, kill switch), and every action your agent takes goes through Altheia — off-chain pre-flight via the SDK, on-chain enforcement via [Swig](https://github.com/anagrambuild/swig-wallet) authority actions (`TokenRecurringLimit` per asset, one `Program` permission per allowed program, etc).
 
 Revoke in one click. The wallet stops signing immediately. No key rotation, no downtime.
 
@@ -34,7 +34,7 @@ This monorepo holds the four open-source TypeScript packages developers install.
                                    ▼
                 ┌─────────────────────────────────────────────────┐
                 │  Swig session key — on-chain enforcement floor  │
-                │   TokenRecurringLimit · ProgramScope · etc      │
+                │   TokenRecurringLimit · Program × N · etc       │
                 │   chain rejects out-of-scope signatures         │
                 └──────────────────┬──────────────────────────────┘
                                    │ valid

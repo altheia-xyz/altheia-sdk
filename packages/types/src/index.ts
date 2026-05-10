@@ -51,7 +51,7 @@ export const PolicyObjectSchema = z.object({
   // Per-asset destination filters (mapped to Swig TokenDestinationLimit)
   asset_destinations: z.record(z.array(z.string())).optional(),
 
-  // Allowed/blocked programs (mapped to Swig Program / ProgramScope)
+  // Allowed programs (mapped to one Swig Program permission per entry)
   allowed_programs: z.array(z.string()).optional(),
   blocked_programs: z.array(z.string()).optional(),
 
