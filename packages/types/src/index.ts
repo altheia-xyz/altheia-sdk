@@ -116,6 +116,12 @@ export const AgentObjectSchema = z.object({
   name: z.string(),
   framework: FrameworkSchema,
   status: AgentStatusSchema,
+  // True when the on-chain register tx has not yet been confirmed back to
+  // the backend. Operator should either complete (sign + post /confirm) or
+  // cancel (POST /agents/:id/cancel). After confirmation this flips false
+  // and registered_tx_signature is populated with the real signature.
+  is_pending: z.boolean().optional(),
+  registered_tx_signature: z.string().nullable().optional(),
   policy: PolicyObjectSchema,
   policy_commitment: z.string(),
   model_commitment: z.string(),
