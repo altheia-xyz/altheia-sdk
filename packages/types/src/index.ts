@@ -51,7 +51,7 @@ export const PolicyObjectSchema = z.object({
   // Per-asset destination filters (mapped to Swig TokenDestinationLimit)
   asset_destinations: z.record(z.array(z.string())).optional(),
 
-  // Allowed/blocked programs (mapped to Swig Program / ProgramScope)
+  // Allowed programs (mapped to one Swig Program permission per entry)
   allowed_programs: z.array(z.string()).optional(),
   blocked_programs: z.array(z.string()).optional(),
 
@@ -116,6 +116,12 @@ export const AgentObjectSchema = z.object({
   name: z.string(),
   framework: FrameworkSchema,
   status: AgentStatusSchema,
+  // True when the on-chain register tx has not yet been confirmed back to
+  // the backend. Operator should either complete (sign + post /confirm) or
+  // cancel (POST /agents/:id/cancel). After confirmation this flips false
+  // and registered_tx_signature is populated with the real signature.
+  is_pending: z.boolean().optional(),
+  registered_tx_signature: z.string().nullable().optional(),
   policy: PolicyObjectSchema,
   policy_commitment: z.string(),
   model_commitment: z.string(),

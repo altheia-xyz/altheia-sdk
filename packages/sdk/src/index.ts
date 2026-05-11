@@ -92,9 +92,16 @@ export class Altheia {
       );
     }
     const result = await fn();
-    // Best-effort outcome report. Failures are silent — the audit row was
-    // created at check() time.
-    void this.report({ action, outcome: "success", audit_event_id: decision.audit_event_id }).catch(() => undefined);
+    // Best-effort outcome report. If fn() returned a string, treat it as a
+    // tx signature and pass it through so the audit row links to a real
+    // on-chain tx instead of a sentinel. Failures are silent.
+    const txSig = typeof result === "string" ? result : undefined;
+    void this.report({
+      action,
+      outcome: "success",
+      audit_event_id: decision.audit_event_id,
+      ...(txSig ? { tx_signature: txSig } : {}),
+    }).catch(() => undefined);
     return result;
   }
 
@@ -122,6 +129,9 @@ export class Altheia {
     outcome: "success" | "failure";
     audit_event_id?: string;
     detail?: string;
+    /** Real Solana tx signature, if the action landed on chain. Passed through
+     *  to the audit row so the chronicle links to Solscan. */
+    tx_signature?: string;
   }): Promise<void> {
     try {
       await this.fetchWithTimeout(`${this.endpoint}/sdk/agent_report`, {
