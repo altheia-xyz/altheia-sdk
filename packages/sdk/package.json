@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "AI agents you can fire — Altheia SDK. Per-action policy, on-chain Swig session keys, one-click revoke. For AI agents on Solana.",
   "license": "Apache-2.0",
-  "homepage": "https://altheia.xyz",
+  "homepage": "https://docs.altheia.xyz",
   "repository": {
     "type": "git",
     "url": "https://github.com/altheia-xyz/altheia-sdk.git",

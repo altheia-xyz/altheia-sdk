@@ -2,6 +2,8 @@
 
 **AI agents you can fire — MCP server.**
 
+📖 Docs: [docs.altheia.xyz](https://docs.altheia.xyz)
+
 Standalone [MCP (Model Context Protocol)](https://modelcontextprotocol.io)
 server that exposes [Altheia](https://altheia.xyz)'s policy + audit layer to
 any MCP-aware client (Claude Desktop, Cursor, ChatGPT, custom agents).

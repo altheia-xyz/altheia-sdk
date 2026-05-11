@@ -2,6 +2,8 @@
 
 **AI agents you can fire — Solana Agent Kit adapter.**
 
+📖 Docs: [docs.altheia.xyz](https://docs.altheia.xyz)
+
 Altheia adapter for [Solana Agent Kit](https://github.com/sendaifun/solana-agent-kit) (SendAI). Wraps a SAK instance so every action — swap, transfer, deposit, borrow, mint, etc. — is gated by Altheia policy and recorded in the audit trail.
 
 ## Install
