@@ -2,6 +2,8 @@
 
 **AI agents you can fire — operator recovery CLI.**
 
+📖 Docs: [docs.altheia.xyz](https://docs.altheia.xyz)
+
 Withdraws every asset from an Altheia agent's Swig smart-account back to your operator wallet, **using only your local keypair**. Does NOT talk to the Altheia backend at all. Proves the non-custody claim end-to-end: even if `altheia.xyz` disappeared overnight, an operator with their keypair can recover their funds in one command.
 
 ## Use

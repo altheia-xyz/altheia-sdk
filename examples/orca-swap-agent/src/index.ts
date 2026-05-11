@@ -166,6 +166,7 @@ async function main(): Promise<void> {
     apiKey: API_KEY,
     endpoint: BACKEND,
     failureMode: "closed",
+    timeoutMs: 5000,
   });
 
   console.log("┌──────────────────────────────────────────────────────────────");

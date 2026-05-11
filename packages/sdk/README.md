@@ -2,6 +2,8 @@
 
 **AI agents you can fire.**
 
+📖 Docs: [docs.altheia.xyz](https://docs.altheia.xyz)
+
 The TypeScript SDK for [Altheia](https://altheia.xyz). Wrap your agent's actions with `altheia.guard()` — they're checked against your operator's policy (off-chain pre-flight) and enforced on-chain at the [Swig](https://github.com/anagrambuild/swig-wallet) session-key signing layer.
 
 Revoke an agent's authority in one click from the dashboard. The wallet stops signing immediately — no key rotation, no downtime.
