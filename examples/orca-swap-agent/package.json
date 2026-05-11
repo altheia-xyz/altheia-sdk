@@ -1,0 +1,28 @@
+{
+  "name": "@altheia-xyz/example-orca-swap-agent",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Devnet Orca Whirlpools swap, wrapped by altheia.guard. Four scenarios prove kill-switch, program filter, real on-chain swap, and revoke+retry.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "demo": "tsx --env-file=.env src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@altheia-xyz/sdk": "workspace:*",
+    "@coral-xyz/anchor": "~0.29.0",
+    "@orca-so/common-sdk": "^0.6.0",
+    "@orca-so/whirlpools-sdk": "^0.13.0",
+    "@solana/spl-token": "^0.4.0",
+    "@solana/web3.js": "^1.95.0",
+    "bn.js": "^5.2.1",
+    "bs58": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
